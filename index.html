@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leitor QR Code - Festa Gabriella</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 25px auto;
+      padding: 18px;
+      text-align: center;
+      background: #fff9fc;
+      color: #333;
+    }
+    h2 { color: #9b4779; }
+    button {
+      padding: 13px 18px;
+      margin: 8px;
+      border: 0;
+      border-radius: 8px;
+      background: #9b4779;
+      color: white;
+      font-size: 16px;
+    }
+    #leitor { width: 100%; margin-top: 20px; }
+    #resultado { overflow-wrap: anywhere; margin: 18px 0; }
+  </style>
+</head>
+<body>
+  <h2>Festa de 15 anos da Gabriella</h2>
+  <p>Recepção — Leitor de QR Code</p>
+  <p>Toque no botão abaixo e autorize o uso da câmera.</p>
+
+  <button id="iniciar" onclick="iniciarLeitor()">Abrir câmera</button>
+  <button id="parar" onclick="pararLeitor()" hidden>Fechar câmera</button>
+
+  <div id="leitor"></div>
+  <div id="resultado" role="status"></div>
+
+  <script>
+    let leitor = null;
+    let processando = false;
+
+    function iniciarLeitor() {
+      if (leitor) return;
+
+      document.getElementById('resultado').textContent = '';
+      leitor = new Html5Qrcode('leitor');
+
+      leitor.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        codigo => {
+          if (processando) return;
+          processando = true;
+          document.getElementById('resultado').innerHTML =
+            '<strong>QR Code lido:</strong><br>' +
+            document.createTextNode(codigo).textContent;
+          pararLeitor();
+        },
+        () => {}
+      ).then(() => {
+        document.getElementById('iniciar').hidden = true;
+        document.getElementById('parar').hidden = false;
+      }).catch(erro => {
+        leitor = null;
+        document.getElementById('resultado').textContent =
+          'Não foi possível abrir a câmera. Verifique a permissão do navegador.';
+      });
+    }
+
+    function pararLeitor() {
+      if (!leitor) return;
+      const atual = leitor;
+      leitor = null;
+      atual.stop().then(() => atual.clear()).catch(() => {});
+      document.getElementById('iniciar').hidden = false;
+      document.getElementById('parar').hidden = true;
+    }
+  </script>
+</body>
+</html>
