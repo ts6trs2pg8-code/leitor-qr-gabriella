@@ -57,10 +57,20 @@
         codigo => {
           if (processando) return;
           processando = true;
-          document.getElementById('resultado').innerHTML =
-            '<strong>QR Code lido:</strong><br>' +
-            document.createTextNode(codigo).textContent;
+         
           pararLeitor();
+
+          document.getElementById('resultado').textContent =
+            'QR Code identificado! Abrindo a recepção...';
+
+          const enderecoAppsScript =
+            'https://script.google.com/macros/s/AKfycbwgHYn15NgRBiNzvgzpzbT0sTZxyBgTUI6S8uYyV0Q_R9pvvfLIYMiI0kzpnSKlJ26whw/exec';
+
+          window.location.href =
+            enderecoAppsScript +
+            '?page=recepcao&codigo=' +
+            encodeURIComponent(codigo);
+
         },
         () => {}
       ).then(() => {
